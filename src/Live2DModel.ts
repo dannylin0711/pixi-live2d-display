@@ -2,7 +2,7 @@ import type { InternalModel, ModelSettings, MotionPriority } from "@/cubism-comm
 import type { MotionManagerOptions } from "@/cubism-common/MotionManager";
 import type { Live2DFactoryOptions } from "@/factory/Live2DFactory";
 import { Live2DFactory } from "@/factory/Live2DFactory";
-import type { Rectangle, Renderer, Texture, Ticker } from "pixi.js";
+import type { Rectangle, Renderer, Texture, Ticker, Observer } from "pixi.js";
 import { Matrix, ObservablePoint, Point } from "pixi.js";
 import { Container } from "pixi.js";
 import { Automator, type AutomatorOptions } from "./Automator";
@@ -27,6 +27,16 @@ export type Live2DConstructor = { new (options?: Live2DModelOptions): Live2DMode
  * @emits {@link Live2DModelEvents}
  */
 export class Live2DModel<IM extends InternalModel = InternalModel> extends Container {
+    Live2DModelObserver = class implements Observer<ObservablePoint> {
+        parent: Live2DModel;
+        _onUpdate: (point?: ObservablePoint | undefined) => void;
+
+        constructor(parent: Live2DModel) {
+            this.parent = parent;
+            this._onUpdate = parent.onAnchorChange.bind(parent);
+        }
+    }
+
     /**
      * Creates a Live2DModel from given source.
      * @param source - Can be one of: settings file URL, settings JSON object, ModelSettings instance.
@@ -107,7 +117,8 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
      * The anchor behaves like the one in `PIXI.Sprite`, where `(0, 0)` means the top left
      * and `(1, 1)` means the bottom right.
      */
-    anchor = new ObservablePoint(this.onAnchorChange, this, 0, 0) as ObservablePoint<any>; // cast the type because it breaks the casting of Live2DModel
+
+    anchor = new ObservablePoint(new this.Live2DModelObserver(this), 0, 0) as ObservablePoint; // cast the type because it breaks the casting of Live2DModel
 
     /**
      * An ID of Gl context that syncs with `renderer.CONTEXT_UID`. Used to check if the GL context has changed.
