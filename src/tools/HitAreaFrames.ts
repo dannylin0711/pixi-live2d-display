@@ -1,8 +1,8 @@
 import type { Live2DModel } from "@/Live2DModel";
-import type { Renderer } from "@pixi/core";
-import { Rectangle } from "@pixi/core";
-import { Graphics } from "@pixi/graphics";
-import { Text, TextStyle } from "@pixi/text";
+import type { Renderer } from "pixi.js";
+import { Rectangle } from "pixi.js";
+import { Graphics } from "pixi.js";
+import { Text, TextStyle } from "pixi.js";
 import type { FederatedPointerEvent } from "pixi.js";
 
 const tempBounds = new Rectangle();

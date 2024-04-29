@@ -3,7 +3,6 @@ import type { Live2DFactoryContext } from "@/factory/Live2DFactory";
 import type { Live2DFactory } from "@/factory/Live2DFactory";
 import { Live2DLoader } from "@/factory/Live2DLoader";
 import type { Middleware } from "@/utils/middleware";
-import { utils } from "@pixi/core";
 import type { ExtendedFileList } from "./FileLoader";
 
 type ZipReader = any;
@@ -101,7 +100,7 @@ export class ZipLoader {
         // only consume the files defined in settings
         for (const definedFile of settings.getDefinedFiles()) {
             // FIXME: deprecated API
-            const actualPath = decodeURI(utils.url.resolve(settings.url, definedFile));
+            const actualPath = decodeURI(new URL(settings.url, definedFile).toString());
 
             if (filePaths.includes(actualPath)) {
                 requiredFilePaths.push(actualPath);

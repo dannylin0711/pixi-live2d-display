@@ -1,4 +1,4 @@
-import { Texture } from "@pixi/core";
+import { Texture } from "pixi.js";
 
 export function createTexture(
     url: string,
@@ -7,8 +7,10 @@ export function createTexture(
     const textureOptions: any = { resourceOptions: { crossorigin: options.crossOrigin } };
 
     // there's already such a method since Pixi v5.3.0
-    if ((Texture as any).fromURL) {
-        return Texture.fromURL(url, textureOptions).catch((e) => {
+    if ((Texture as any).from) {
+        try {
+            return Promise.resolve(Texture.from(url, textureOptions));
+        } catch (e: any) {
             if (e instanceof Error) {
                 throw e;
             }
@@ -18,7 +20,7 @@ export function createTexture(
             (err as any).event = e;
 
             throw err;
-        });
+        }
     }
 
     // and in order to provide backward compatibility for older Pixi versions,
@@ -29,7 +31,7 @@ export function createTexture(
 
     const texture = Texture.from(url, textureOptions);
 
-    if (texture.baseTexture.valid) {
+    if (texture.baseTexture.resource.valid) {
         return Promise.resolve(texture);
     }
 
