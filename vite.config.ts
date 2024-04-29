@@ -50,9 +50,7 @@ export default defineConfig(({ command, mode }) => {
                 name: "PIXI.live2d",
             },
             rollupOptions: {
-                external(id, parentId, isResolved) {
-                    
-                },
+                external(id, parentId, isResolved) {},
                 output: {
                     extend: true,
                     globals(id: string) {

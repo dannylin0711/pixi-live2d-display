@@ -1,3 +1,6 @@
+import "../core/live2d";
+import "../core/live2dcubismcore";
+import "./types/env";
 /// <reference path="../core/live2d.d.ts"/>
 /// <reference path="../core/live2dcubismcore.d.ts"/>
 /// <reference path="./types/env.d.ts"/>
