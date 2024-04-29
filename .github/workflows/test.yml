@@ -35,6 +35,7 @@ jobs:
             !core/live2d.d.ts
           key: ${{ hashFiles('scripts/setup.js') }}
       - run: NODE_ENV=development
+      - run: npm install --save @types/offscreencanvas
       - run: npm ci
 
       - name: Set up core files
