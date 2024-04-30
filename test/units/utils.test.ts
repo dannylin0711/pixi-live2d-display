@@ -19,7 +19,7 @@ test("middlewares", async () => {
                 numbers.push(2);
                 return next();
             },
-            () => {
+            async () => {
                 numbers.push(3);
             },
         ],

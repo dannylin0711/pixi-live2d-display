@@ -8,7 +8,7 @@ import shizukuJson from "./assets/shizuku/shizuku.model.json";
 import shizukuJsonUrl from "./assets/shizuku/shizuku.model.json?url";
 import shakeSound from "./assets/shizuku/sounds/shake_00.mp3?url";
 
-import { Application } from "@pixi/app";
+import { Application } from "pixi.js";
 import { memoize, pull, pullAll } from "lodash-es";
 import type { Awaitable, TestContext } from "vitest";
 import { test as baseTest, describe, vi } from "vitest";

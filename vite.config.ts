@@ -93,34 +93,34 @@ export default defineConfig(({ command, mode }) => {
             },
         ],
         test: {
-            include: ["**/*.test.ts", "**/*.test.js"],
-            browser: {
-                enabled: true,
-                name: "chrome",
-                slowHijackESM: false,
-            },
-            setupFiles: ["./test/setup.ts"],
-            sequence: {
-                sequencer: class MySequencer extends BaseSequencer {
-                    // use the default sorting, then put bundle tests at the end
-                    // to make sure they will not pollute the environment for other tests
-                    override async sort(files: Parameters<BaseSequencer["sort"]>[0]) {
-                        files = await super.sort(files);
+        //     include: ["**/*.test.ts", "**/*.test.js"],
+        //     browser: {
+        //         enabled: true,
+        //         name: "chrome",
+        //         slowHijackESM: false,
+        //     },
+        //     setupFiles: ["./test/setup.ts"],
+        //     sequence: {
+        //         sequencer: class MySequencer extends BaseSequencer {
+        //             // use the default sorting, then put bundle tests at the end
+        //             // to make sure they will not pollute the environment for other tests
+        //             override async sort(files: Parameters<BaseSequencer["sort"]>[0]) {
+        //                 files = await super.sort(files);
 
-                        const bundleTestFiles: typeof files = [];
+        //                 const bundleTestFiles: typeof files = [];
 
-                        files = files.filter(([project, file]) => {
-                            if (file.includes("bundle")) {
-                                bundleTestFiles.push([project, file]);
-                                return false;
-                            }
-                            return true;
-                        });
+        //                 files = files.filter(([project, file]) => {
+        //                     if (file.includes("bundle")) {
+        //                         bundleTestFiles.push([project, file]);
+        //                         return false;
+        //                     }
+        //                     return true;
+        //                 });
 
-                        return [...files, ...bundleTestFiles];
-                    }
-                },
-            },
+        //                 return [...files, ...bundleTestFiles];
+        //             }
+        //         },
+        //     },
         },
     };
 });

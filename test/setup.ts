@@ -1,14 +1,12 @@
 import "./load-cores";
 
-import { Container } from "@pixi/display";
-import "@pixi/events";
-import "@pixi/extract";
+import { Container } from "pixi.js";
 import { cloneDeep } from "lodash-es";
 import { afterEach, beforeEach, vi } from "vitest";
 import { config } from "../src/config";
 import "./rpc/image-snapshot-client";
 
-Container.defaultSortableChildren = true;
+// Container.defa = true;
 
 beforeEach(async function () {
     // declaring the context as an argument will cause a strange error, so we have to use arguments

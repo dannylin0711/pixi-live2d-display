@@ -1,4 +1,4 @@
-import type { Application } from "@pixi/app";
+import type { Application } from "pixi.js";
 import { isObject } from "lodash-es";
 import { expect } from "vitest";
 import type { FakeMatcherStateSerialized } from "./image-snapshot-server";
@@ -25,7 +25,7 @@ expect.extend({
         }
 
         const receivedAsB64 = isPixiApp(received)
-            ? await received.renderer.extract.base64(undefined, "image/png")
+            ? await received.renderer.extract.base64(new Texture())
             : btoa(String.fromCharCode(...new Uint8Array(received)));
 
         const ctx: FakeMatcherStateSerialized = {

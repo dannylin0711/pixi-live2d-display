@@ -1,5 +1,5 @@
 import { createTexture } from "@/factory/texture";
-import { Texture } from "@pixi/core";
+import { Texture } from "pixi.js";
 import { expect } from "vitest";
 import { TEST_TEXTURE, test } from "../env";
 
