@@ -3,7 +3,7 @@ import type { MotionManagerOptions } from "@/cubism-common/MotionManager";
 import type { Live2DFactoryOptions } from "@/factory/Live2DFactory";
 import { Live2DFactory } from "@/factory/Live2DFactory";
 import type { Rectangle, Renderer, Texture, Ticker, Observer } from "pixi.js";
-import { Matrix, ObservablePoint, Point } from "pixi.js";
+import { Matrix, ObservablePoint, Point, RenderContainer, WebGPURenderer } from "pixi.js";
 import { Container } from "pixi.js";
 import { Automator, type AutomatorOptions } from "./Automator";
 import { Live2DTransform } from "./Live2DTransform";
@@ -26,7 +26,7 @@ export type Live2DConstructor = { new (options?: Live2DModelOptions): Live2DMode
  * ```
  * @emits {@link Live2DModelEvents}
  */
-export class Live2DModel<IM extends InternalModel = InternalModel> extends Container {
+export class Live2DModel<IM extends InternalModel = InternalModel> extends RenderContainer {
     Live2DModelObserver = class implements Observer<ObservablePoint> {
         parent: Live2DModel;
         _onUpdate: (point?: ObservablePoint | undefined) => void;
@@ -137,8 +137,8 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
 
     automator: Automator;
 
-    constructor(options?: Live2DModelOptions) {
-        super();
+    constructor(options: Live2DModelOptions = {}) {
+        super(options as any);
 
         this.automator = new Automator(this, options);
 
@@ -255,19 +255,19 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
         result: Point = position.clone(),
         skipUpdate?: boolean,
     ): Point {
-        if (!skipUpdate) {
-            this._recursivePostUpdateTransform();
+        // if (!skipUpdate) {
+        //     this._recursivePostUpdateTransform();
 
-            if (!this.parent) {
-                (this.parent as any) = this._tempDisplayObjectParent;
-                this.displayObjectUpdateTransform();
-                (this.parent as any) = null;
-            } else {
-                this.displayObjectUpdateTransform();
-            }
-        }
+        //     if (!this.parent) {
+        //         (this.parent as any) = this._tempDisplayObjectParent;
+        //         this.displayObjectUpdateTransform();
+        //         (this.parent as any) = null;
+        //     } else {
+        //         this.displayObjectUpdateTransform();
+        //     }
+        // }
 
-        this.transform.worldTransform.applyInverse(position, result);
+        // this.transform.worldTransform.applyInverse(position, result);
         this.internalModel.localTransform.applyInverse(result, result);
 
         return result;
@@ -278,19 +278,13 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
      * @param point - A Point in world space.
      * @return True if the point is inside this model.
      */
-    containsPoint(point: Point): boolean {
-        return this.getBounds(true).contains(point.x, point.y);
+    containsPoint = (point: Point): boolean => {
+        return this.getBounds(true).rectangle.contains(point.x, point.y);
     }
 
     /** @override */
     protected _calculateBounds(): void {
-        this._bounds.addFrame(
-            this.transform,
-            0,
-            0,
-            this.internalModel.width,
-            this.internalModel.height,
-        );
+        this.bounds.addFrame(0, 0, this.internalModel.width, this.internalModel.height);
     }
 
     /**
@@ -305,11 +299,16 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
         // don't call `this.internalModel.update()` here, because it requires WebGL context
     }
 
-    override _render(renderer: Renderer): void {
+    override render(renderer: Renderer): void {
+        if (renderer instanceof WebGPURenderer) {
+            throw "Only support WebGLRenderer for now.";
+        }
+
         // reset certain systems in renderer to make Live2D's drawing system compatible with Pixi
-        renderer.batch.reset();
+        // TODO: need fix here
+        // renderer.batch.reset();
         renderer.geometry.reset();
-        renderer.shader.reset();
+        // renderer.shader.reset();
         renderer.state.reset();
 
         let shouldUpdateTexture = false;
@@ -326,7 +325,7 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
         for (let i = 0; i < this.textures.length; i++) {
             const texture = this.textures[i]!;
 
-            if (!texture.valid) {
+            if (!texture.baseTexture.resource.valid) {
                 continue;
             }
 
@@ -356,8 +355,9 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
             (texture.baseTexture as any).touched = renderer.textureGC.count;
         }
 
-        const viewport = (renderer.framebuffer as any).viewport as Rectangle;
-        this.internalModel.viewport = [viewport.x, viewport.y, viewport.width, viewport.height];
+        // TODO: need fix here
+        // const viewport = (renderer.framebuffer as any).viewport as Rectangle;
+        // this.internalModel.viewport = [viewport.x, viewport.y, viewport.width, viewport.height];
 
         // update only if the time has changed, as the model will possibly be updated once but rendered multiple times
         if (this.deltaTime) {
@@ -366,7 +366,8 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
         }
 
         const internalTransform = tempMatrix
-            .copyFrom(renderer.globalUniforms.uniforms.projectionMatrix)
+            // TODO: need fix here
+            // .copyFrom(renderer.globalUniforms.uniformGroup.uniforms.projectionMatrix)
             .append(this.worldTransform);
 
         this.internalModel.updateTransform(internalTransform);
@@ -374,7 +375,11 @@ export class Live2DModel<IM extends InternalModel = InternalModel> extends Conta
 
         // reset WebGL state and texture bindings
         renderer.state.reset();
-        renderer.texture.reset();
+        renderer.texture.managedTextures.forEach((texture) => {
+            renderer.texture.unbind(texture);
+        })
+        // same function? need tests
+        // renderer.texture.reset();
     }
 
     /**
