@@ -31,7 +31,7 @@ export class HitAreaFrames extends Graphics {
             fontSize: 24,
             fill: "#ffffff",
             stroke: "#000000",
-            strokeThickness: 4,
+            // strokeThickness: 4,
         });
 
         this.texts = Object.keys(internalModel.hitAreas).map((hitAreaName) => {
@@ -53,21 +53,20 @@ export class HitAreaFrames extends Graphics {
         });
     }
 
-    /** @override */
-    protected _render(renderer: Renderer): void {
+    override onRender: () => void = () => {
         const internalModel = (this.parent as Live2DModel).internalModel;
 
         // extract scale from the transform matrix, and invert it to ease following calculation
         // https://math.stackexchange.com/a/13165
-        const scale =
-            1 /
-            Math.sqrt(this.transform.worldTransform.a ** 2 + this.transform.worldTransform.b ** 2);
+        const scale = 1 // temp value, need update
+        // const scale = 1 / Math.sqrt(this.transform.arguments.A ** 2 + this.transform.b ** 2);
 
         this.texts.forEach((text) => {
-            this.lineStyle({
-                width: this.strokeWidth * scale,
-                color: text.visible ? this.activeColor : this.normalColor,
-            });
+            // this.lineStyle({
+            //     width: this.strokeWidth * scale,
+            //     color: text.visible ? this.activeColor : this.normalColor,
+            // });
+
 
             const bounds = internalModel.getDrawableBounds(
                 internalModel.hitAreas[text.text]!.index,
@@ -87,8 +86,8 @@ export class HitAreaFrames extends Graphics {
             text.scale.set(scale);
         });
 
-        super._render(renderer);
-
+        // super.render(renderer);
+        super.onRender();
         this.clear();
     }
 }
