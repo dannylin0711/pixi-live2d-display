@@ -1,5 +1,3 @@
-import "./types/helpers";
-import "./types/env";
 /// <reference path="types/helpers.d.ts"/>
 /// <reference path="types/env.d.ts"/>
 
